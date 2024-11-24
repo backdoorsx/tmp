@@ -29,9 +29,14 @@ def crack(core, wordlist, file):
 #if __name__ == "__main__":
 def main(t):
     chars = string.digits
-    #chars = string.ascii_lowercase
+    chars = string.ascii_lowercase
+    chars = string.digits + string.ascii_lowercase
+    
     print(chars)
     wordlist = []
+    # 3.7GHz CPUs 8 :
+    # 94seconds = digits+ascii_lowercase repeat=4 wordlist length = 1.679.616
+    # = digits+ascii_lowercase repeat=5 wordlist length = 60.466.176 (need +8G RAM)
     for xs in itertools.product(chars, repeat=5):
         wordlist.append(''.join(xs))
 
@@ -42,20 +47,6 @@ def main(t):
     print(multiprocessing.cpu_count())
     
     s = time.monotonic()
-
-    #zobrat kazde 4te
-    div_first = int(len(wordlist[:div])/2)
-    div_second = int(len(wordlist[div:])/2)
-
-    first_wordlist = wordlist[:div]
-    first_wordlist = first_wordlist[:div_first]
-    second_wordlist = wordlist[:div]
-    second_wordlist = second_wordlist[div_first:]
-
-    third_wordlist = wordlist[div:]
-    third_wordlist = third_wordlist[:div_second]
-    fourth_wordlist = wordlist[div:]
-    fourth_wordlist = fourth_wordlist[div_second:]
 
     cores = 8
     processes = []
@@ -70,10 +61,10 @@ def main(t):
             print(f'core {c+1} wordlist[{a}:{b}]')
             processes.append(multiprocessing.Process(target=crack, args=(c, wordlist[a:b], pdf_file)))
 
-    for process in processes:
+    for process in processes: # start all processes
         process.start()
     
-    for process in processes:
+    for process in processes: # wait for all processes to complete
         process.join()
     
 ##    p1 = multiprocessing.Process(target=crack, args=(1, first_wordlist, pdf_file))
